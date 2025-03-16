@@ -1,11 +1,11 @@
 # React Context
-___
+
 ## React Context consist three main components
 1. Create Component
 2. Create Provider
 3. Wrap the component with provider and get data using useContext() hook
 
----
+
 > ## Mostly these two way are  used
 >
 >### First by creaitng the context and contextprovider which will be wrap around the childern component that need the props inside the context
@@ -71,7 +71,7 @@ function App() {
 export default App
 
 ```
-
+___
 >### Second way is less code and mostly used in corporator
 
 ```Context.js
