@@ -6,11 +6,9 @@
 > ## Install redux and redix-toolkit (rtk)
 
 ```shell
-npm install @reduxjs/toolkit
+npm install @reduxjs/toolkit react-redux
 ```
-```shell
-npm install react-redux
-```
+
 ## Important thing we  need to know
 > 1. Store
 > 2. Reducer [It is used to do operations on store]
@@ -32,39 +30,54 @@ export const store = configureStore({
 ### After creating store we create slice which is a given name for creating feature , it should cosist name,initial state and reducer like given in this code
 >* Whene we create reducer we always get state and action
 
-## Example Code (Redux Toolkit):
+## Create Slice:
 
 
 ```jsx
-import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { Provider, useDispatch, useSelector } from "react-redux";
+import {createSlice, nanoid } from '@reduxjs/toolkit';
 
-const counterSlice = createSlice({
-  name: "counter",
-  initialState: { value: 0 },
-  reducers: {
-    increment: (state) => { state.value += 1; },
-    decrement: (state) => { state.value -= 1; }
-  }
-});
+const initialState = {
+    todos: [{id: 1, text: "Hello world"}]
+}
 
-const store = configureStore({ reducer: { counter: counterSlice.reducer } });
+export const todoSlice = createSlice({
+    name: 'todo',
+    initialState,
+    reducers: {
+        addTodo: (state, action) => {
+            const todo = {
+                id: nanoid(),
+                text: action.payload
+            }
+            state.todos.push(todo)
+        },
+        removeTodo: (state, action) => {
+            state.todos = state.todos.filter((todo) => todo.id !== action.payload )
+        },
+    }
+})
 
-export const { increment, decrement } = counterSlice.actions;
-export const useCounter = () => useSelector((state) => state.counter.value);
-export const useCounterDispatch = () => useDispatch();
+export const {addTodo, removeTodo} = todoSlice.actions
 
-export const ReduxProvider = ({ children }) => (
-  <Provider store={store}>{children}</Provider>
-);
+export default todoSlice.reducer
 
 ```
 
 ## Usage
-```jsx
-const counter = useCounter();
-const dispatch = useCounterDispatch();
-dispatch(increment());
+```usage.jsx
+    // useSelector is used to get current state of the store
+    const todos = useSelector(state => state.todos)
+
+    // useDispatch is used to manipulate the store but using reducers
+
+    const [input, setInput] = useState('')
+    const dispatch = useDispatch()
+
+    const addTodoHandler = (e) => {
+        e.preventDefault()
+        dispatch(addTodo(input))
+        setInput('')
+    }
 
 ```
 
