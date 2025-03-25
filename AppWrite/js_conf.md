@@ -87,112 +87,142 @@ export default auth;
 
 ## Database part [Here we take an example for post]
 ```Database.js
-import {Client, Databases ,Storage,ID} from "appwrite";
-import env_conf from "../env_conf/env_conf.js";
-
-class DB {
+import { Client, Account ,ID , AuthenticationFactor} from "appwrite";
+class Auth {
     client = new Client();
-    databases;
+    account;
     constructor(){
         try {
             this.client
                 .setEndpoint(env_conf.appwrite_url) // Your API Endpoint
                 .setProject(env_conf.appwrite_project_id); // Your project ID
-            this.databases = new Databases(this.client);
+            this.account = new Account(this.client);
         }
         catch (e) {
-            throw e;
+            console.log('Auth.js :: constructor :: Error:', e);
         }
     }
 
-    async createPost({p_title, slug, p_post, status, user_id, p_images}){
+    async createAccount({email, password, name}){
         try {
-            return await this.databases.createDocument(
-                env_conf.appwrite_database_id, // databaseId
-                env_conf.appwrite_collection_id, // collectionId
-                slug, // documentId
-                {
-                    p_title,
-                    p_post,
-                    status,
-                    user_id,
-                    p_images
-                }, // data
-            );
+            console.log("Creating account");
+            this.account.create(
+                ID.unique() ,// userId
+                email, // email
+                password, // password
+                name // name (optional)
+            )
+            .then( () => {
+                this.login({email, password})
+                    .then(() => {
+                        this.createEmailVerification()
+                            .then((response) => {
+                                return response;
+                            })
+                    },(error) =>{
+                        console.log('createAccount :: login :: Error:', error);
+                    })
+            }, function (error) {
+                throw error // Failure
+            });
+        }
+        catch(error){
+            console.log('Auth.js :: createAccount :: Error:',error);
+        }
+    }
+
+    async deleteAccount({id}){
+        try{
+            return await this.account.delete(id);
         }
         catch (e) {
-            throw e;
+            console.log('Auth.js :: deleteAccount :: Error:',e);
+        }
+    }
+
+    async login({email, password}){
+        try {
+            return await this.account.createEmailPasswordSession(email, password);
+        }
+        catch(error){
+            console.log('Auth.js :: login :: Error:',error);
+        }
+    }
+
+    async logout(){
+        try {
+            return await this.account.deleteSessions();
+        }
+        catch(error){
+            console.log('Auth.js :: logout :: Error:',error);
+        }
+    }
+
+    async getCurrentUser(){
+        try {
+            return await this.account.get();
+        }
+        catch(error){
+            console.log('Auth.js :: getCurrentUser :: Error:',error);
+            return null;
         }
 
     }
 
-    async updatePost(slug,{p_title,p_post,status,user_id,p_images}){
+    async sendOTP({email}){
         try {
-            return await this.databases.updateDocument(
-                env_conf.appwrite_database_id, // databaseId
-                env_conf.appwrite_collection_id, // collectionId
-                slug, // documentId
-                {
-                    p_title,
-                    p_post,
-                    status,
-                    p_images
-                }, // data
+            return await this.account.createEmailToken(
+                ID.unique(),
+                email
             );
         }
-        catch (e) {
-            throw e;
+        catch(error){
+            console.log('Auth.js :: sendOTP :: Error:',error);
         }
     }
 
-    async deletePost(slug){
+    async verifyOTP({id,otp}){
         try {
-            await this.databases.deleteDocument(
-                env_conf.appwrite_database_id, // databaseId
-                env_conf.appwrite_collection_id, // collectionId
-                slug // documentId
-            );
-            return true;
-        }
-        catch (e) {
-            throw e;
-        }
-
-    }
-
-    async listPost(query=[]) {
-        try {
-            return await this.databases.listDocuments(
-                env_conf.appwrite_database_id, // databaseId
-                env_conf.appwrite_collection_id, // collectionId
-                query // queries (optional)
+            return await this.account.createSession(
+                id,
+                otp
             );
         }
-        catch (e){
-            throw e;
+        catch(error){
+            console.log('Auth.js :: verifyOTP :: Error:',error);
         }
     }
 
-    async getPost(slug) {
+    async createEmailVerification(){
+        this.account.createVerification(
+            'http://localhost:5173/verify'
+        )
+        .then((result) => {
+            return result
+        })
+    }
+
+    async updateVerification({userId,secret}){
         try {
-            return await this.databases.getDocument(
-                env_conf.appwrite_database_id, // databaseId
-                env_conf.appwrite_collection_id, // collectionId
-                slug, // documentId
-                [] // queries (optional)
-            );
+            console.log(userId);
+            console.log(secret);
+            this.account.updateVerification(userId, secret)
+                .then( (response) => {
+                    return response; // Success
+                }, function (error) {
+                    console.log(error); // Failure
+                });
         }
-        catch (e){
-            throw e;
+        catch(error){
+            console.log('Auth.js :: createSession :: Error:',error);
         }
     }
-
-
 
 }
 
-const db = new DB()
-export default db;
+const auth = new Auth();
+
+export default auth;
 ```
 
 ## Storage part
