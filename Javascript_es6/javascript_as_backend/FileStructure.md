@@ -1,0 +1,12 @@
+# FileStructure tha is recommended
+- src/
+    - index [Point where first time call will hit]
+    - app [Congig,UrlEncode,Cookies,etc]
+    - constant [enums,DB-name,etc]\
+    - DB/
+    - Models/
+    - Controller/
+    - Routes/
+    - Middlewares
+    - Utils/
+    - More/ (Depends)
