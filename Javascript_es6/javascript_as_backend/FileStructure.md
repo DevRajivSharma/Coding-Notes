@@ -1,6 +1,6 @@
 # FileStructure that is recommended
 - src/
-    - index [Point where first time call will hit]
+    - index.js / server.js / main.js [Entry Point , can be of any name]
     - app [Congig,UrlEncode,Cookies,etc]
     - constant [enums,DB-name,etc]
     - DB/
