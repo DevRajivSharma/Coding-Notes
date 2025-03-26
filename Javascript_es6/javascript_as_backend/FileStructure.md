@@ -1,4 +1,4 @@
-# FileStructure tha is recommended
+# FileStructure that is recommended
 - src/
     - index [Point where first time call will hit]
     - app [Congig,UrlEncode,Cookies,etc]
