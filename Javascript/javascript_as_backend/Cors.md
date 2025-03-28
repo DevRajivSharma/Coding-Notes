@@ -12,9 +12,9 @@
     2. Vite
         - Add server field to your vite.config.js
         ```vite.config.js
-            export default defineConfig({
+        export default defineConfig({
               server: {
-               '/api':'http://jsonplaceholder.typicode.com',
+                    '/api':'http://jsonplaceholder.typicode.com',
               },
             })
         ```
