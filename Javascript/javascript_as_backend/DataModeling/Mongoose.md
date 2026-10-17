@@ -22,7 +22,7 @@ export const User = mongoose.model('User', userSchema);
 
 
 ```
-> ### Note : In MongoDB field are saved in lowercase with 's' appended in its end
+> ### Note : In MongoDB model names are saved in lowercase with 's' appended in its end
 
 ### Crude Opertation
 - Create:
